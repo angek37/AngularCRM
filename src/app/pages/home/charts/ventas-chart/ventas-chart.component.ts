@@ -32,6 +32,10 @@ export class VentasChartComponent implements AfterViewInit, OnDestroy {
             }
           );
           this.draw();
+        },
+        (error) => {
+          console.log('An error has been occur');
+          this.draw();
         }
       );
   }
