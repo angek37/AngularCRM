@@ -5,12 +5,13 @@ import {CrmService} from '../../../../services/crm.service';
 @Component({
   selector: 'ngx-echarts-pie',
   template: `
-    <div echarts [options]="options" class="echart"></div>
+    <div echarts [loading]="loading" [options]="options" class="echart"></div>
   `,
 })
 export class OportunidadesChartComponent implements AfterViewInit, OnDestroy {
   options: any = {};
   themeSubscription: any;
+  loading = true;
   query = '$select=statecode';
   data = [
     {name: 'Abierta', value: 0},
@@ -25,6 +26,7 @@ export class OportunidadesChartComponent implements AfterViewInit, OnDestroy {
     this.crm.getEntities('opportunities', this.query)
       .subscribe(
         (resp: any) => {
+          this.loading = false;
           resp.value.forEach(
             (element) => {
               switch (element.statecode) {

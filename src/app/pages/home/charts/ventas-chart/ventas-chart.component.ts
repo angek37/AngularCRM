@@ -5,12 +5,13 @@ import {CrmService} from '../../../../services/crm.service';
 @Component({
   selector: 'ngx-echarts-bar',
   template: `
-    <div echarts [options]="options" class="echart"></div>
+    <div echarts [loading]="loading" [options]="options" class="echart"></div>
   `,
 })
 export class VentasChartComponent implements AfterViewInit, OnDestroy {
   options: any = {};
   themeSubscription: any;
+  loading = true;
   data: any;
   query = '$select=actualvalue&$expand=owninguser($select=fullname)&$orderby=actualvalue desc&$top=7';
   columns = [];
@@ -25,6 +26,7 @@ export class VentasChartComponent implements AfterViewInit, OnDestroy {
       .subscribe(
         (resp: Response) => {
           this.data = resp;
+          this.loading = false;
           this.data.value.forEach(
             (element: any) => {
               this.columns.push(element.owninguser.fullname);

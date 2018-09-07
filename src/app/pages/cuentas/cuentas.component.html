@@ -1,10 +1,41 @@
-<nb-card>
-  <nb-card-header>
-    Cuentas
-  </nb-card-header>
-
-  <nb-card-body>
-    <ng2-smart-table [settings]="settings" [source]="source" (deleteConfirm)="onDeleteConfirm($event)">
-    </ng2-smart-table>
-  </nb-card-body>
-</nb-card>
+<nb-flip-card [showToggleButton]="false" [flipped]="flipped">
+  <nb-card-front>
+    <nb-card accent="primary">
+      <nb-card-header>
+        Cuentas
+      </nb-card-header>
+      <nb-card-body>
+        <ng2-smart-table [settings]="settings" [source]="source" (create)="flipped = true" (deleteConfirm)="onDeleteConfirm($event)">
+        </ng2-smart-table>
+      </nb-card-body>
+    </nb-card>
+  </nb-card-front>
+  <nb-card-back>
+    <nb-card accent="success">
+      <nb-card-header>
+        Nueva Cuenta
+      </nb-card-header>
+      <nb-card-body>
+        <div class="input-group">
+          <input type="text" placeholder="Nombre" class="form-control"/>
+        </div>
+        <div class="row full-name-inputs">
+          <div class="col-sm-6 input-group">
+            <input type="text" placeholder="Ciudad" class="form-control"/>
+          </div>
+          <div class="col-sm-6 input-group">
+            <input type="text" placeholder="Estado" class="form-control"/>
+          </div>
+        </div>
+        <div class="input-group">
+          <input type="text" placeholder="País" class="form-control"/>
+        </div>
+        <div class="input-group has-person-icon">
+          <input type="text" placeholder="Contacto Principal" class="form-control"/>
+        </div>
+        <button style="margin: 10px" class="btn {{ settingsBtn[2].class }} btn-demo">Guardar</button>
+        <button style="margin: 10px" class="btn {{ settingsBtn[4].class }} btn-demo" (click)="flipped = false">{{ settingsBtn[4].buttonTitle }}</button>
+      </nb-card-body>
+    </nb-card>
+  </nb-card-back>
+</nb-flip-card>

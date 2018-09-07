@@ -15,7 +15,8 @@ export class HeaderComponent implements OnInit {
   @Input() position = 'normal';
 
   user = {
-    name: ''
+    name: '',
+    username: ''
   };
 
   userMenu = [{ title: 'Log out', link: '/logout' }];
@@ -29,6 +30,7 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit() {
     this.user.name = this.adalSvc.userInfo.profile.name;
+    this.user.username = this.adalSvc.userInfo.profile.unique_name;
   }
 
   toggleSidebar(): boolean {

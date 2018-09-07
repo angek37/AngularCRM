@@ -10,6 +10,8 @@ import { VentasChartComponent } from './home/charts/ventas-chart/ventas-chart.co
 import {NgxEchartsModule} from 'ngx-echarts';
 import { OportunidadesChartComponent } from './home/charts/oportunidades-chart/oportunidades-chart.component';
 import {Ng2SmartTableModule} from 'ng2-smart-table';
+import { MapChartComponent } from './home/charts/map-chart/map-chart.component';
+import {FormsRoutingModule} from './forms/forms-routing.module';
 
 const PAGES_COMPONENTS = [
   PagesComponent,
@@ -25,10 +27,12 @@ const PAGES_COMPONENTS = [
     PagesRoutingModule,
     ThemeModule,
     NgxEchartsModule,
-    Ng2SmartTableModule
+    Ng2SmartTableModule,
+    // FormsRoutingModule
   ],
   declarations: [
-    ...PAGES_COMPONENTS
+    ...PAGES_COMPONENTS,
+    MapChartComponent
   ],
 })
 export class PagesModule {
