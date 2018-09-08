@@ -1,6 +1,7 @@
 <nb-flip-card [showToggleButton]="false" [flipped]="flipped">
+  <toaster-container [toasterconfig]="toasterConfig"></toaster-container>
   <nb-card-front>
-    <nb-card accent="primary">
+    <nb-card accent="primary" [nbSpinner]="loading" nbSpinnerMessage="Cargando..." nbSpinnerSize="large">
       <nb-card-header>
         Cuentas
       </nb-card-header>
@@ -16,25 +17,31 @@
         Nueva Cuenta
       </nb-card-header>
       <nb-card-body>
-        <div class="input-group">
-          <input type="text" placeholder="Nombre" class="form-control"/>
-        </div>
-        <div class="row full-name-inputs">
-          <div class="col-sm-6 input-group">
-            <input type="text" placeholder="Ciudad" class="form-control"/>
+        <form (submit)="onSubmit(f)" #f="ngForm">
+          <div class="input-group">
+            <input type="text" ngModel name="name" placeholder="Nombre" required
+                   class="form-control" />
           </div>
-          <div class="col-sm-6 input-group">
-            <input type="text" placeholder="Estado" class="form-control"/>
+          <div class="row full-name-inputs">
+            <div class="col-sm-6 input-group">
+              <input type="text" ngModel name="city" placeholder="Ciudad" class="form-control"/>
+            </div>
+            <div class="col-sm-6 input-group">
+              <input type="text" ngModel name="state" placeholder="Estado" required class="form-control"/>
+            </div>
           </div>
-        </div>
-        <div class="input-group">
-          <input type="text" placeholder="País" class="form-control"/>
-        </div>
-        <div class="input-group has-person-icon">
-          <input type="text" placeholder="Contacto Principal" class="form-control"/>
-        </div>
-        <button style="margin: 10px" class="btn {{ settingsBtn[2].class }} btn-demo">Guardar</button>
-        <button style="margin: 10px" class="btn {{ settingsBtn[4].class }} btn-demo" (click)="flipped = false">{{ settingsBtn[4].buttonTitle }}</button>
+          <div class="input-group">
+            <input type="text" name="country" ngModel placeholder="País" required class="form-control"/>
+          </div>
+          <div class="input-group has-person-icon">
+            <input type="text" name="contact" ngModel placeholder="Contacto Principal" class="form-control"/>
+          </div>
+          <button style="margin: 10px"
+                  class="btn {{ settingsBtn[2].class }} btn-demo"
+                  type="submit"
+                  [disabled]="!f.valid">Guardar</button>
+          <button style="margin: 10px" class="btn {{ settingsBtn[4].class }} btn-demo" (click)="flipped = false; f.reset()">{{ settingsBtn[4].buttonTitle }}</button>
+        </form>
       </nb-card-body>
     </nb-card>
   </nb-card-back>

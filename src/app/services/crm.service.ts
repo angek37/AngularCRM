@@ -30,4 +30,10 @@ export class CrmService {
       + (conditions ? '?' + conditions : '')
       , {headers: this.headers});
   }
+
+  postEntity(entity: string, record: any) {
+    return this.http.post(environment.ad.crm +
+      entity, record,
+      {headers: this.headers});
+  }
 }

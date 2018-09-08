@@ -3,6 +3,9 @@ import { LocalDataSource } from 'ng2-smart-table';
 import {CrmService} from '../../services/crm.service';
 import {NbThemeService} from '@nebular/theme';
 import {Subscription} from 'rxjs/index';
+import {NgForm} from '@angular/forms';
+import {BodyOutputType, Toast, ToasterConfig, ToasterService} from 'angular2-toaster';
+
 
 @Component({
   selector: 'ngx-smart-table',
@@ -10,7 +13,15 @@ import {Subscription} from 'rxjs/index';
   styleUrls: ['./cuentas.component.scss']
 })
 export class CuentasComponent implements OnInit {
+  toasterConfig: ToasterConfig;
   flipped = false;
+  loading = true;
+  account = {
+    name: '',
+    address1_city: '',
+    address1_country: '',
+    address1_stateorprovince: ''
+  };
   settings = {
     mode: 'external',
     actions: {
@@ -72,7 +83,7 @@ export class CuentasComponent implements OnInit {
   themeSubscription: Subscription;
 
 
-  constructor(private crm: CrmService, private themeService: NbThemeService) {
+  constructor(private crm: CrmService, private themeService: NbThemeService, private toasterService: ToasterService) {
     this.themeSubscription = this.themeService.getJsTheme().subscribe(theme => {
       this.init(theme.variables);
     });
@@ -178,7 +189,7 @@ export class CuentasComponent implements OnInit {
       .subscribe(
         (resp: any) => {
           this.source.load(resp.value);
-          // console.log(resp);
+          this.loading = false;
         }
       );
   }
@@ -189,6 +200,51 @@ export class CuentasComponent implements OnInit {
     } else {
       event.confirm.reject();
     }
+  }
+
+  onSubmit(form: NgForm) {
+    this.loading = true;
+    this.account.name = form.form.value.name;
+    this.account.address1_city = form.form.value.city;
+    this.account.address1_stateorprovince = form.form.value.state;
+    this.account.address1_country = form.form.value.country;
+    if (form.form.value.contact !== '') {
+      this.account['primarycontactid@odata.bind'] = '/contacts(' + form.form.value.contact + ')';
+    }
+    this.crm.postEntity('accounts', this.account)
+      .subscribe(
+        (value: any) => {
+          this.loading = false;
+          form.reset();
+          this.flipped = false;
+          this.showToast('success', 'Éxito', 'Se ha creado la cuenta');
+        }
+        ,
+        (error: any) => {
+          this.showToast('error', '¡Error!', 'Se ha producido un error al crear la cuenta');
+        }
+      );
+  }
+
+  private showToast(type: string, title: string, body: string) {
+    this.toasterConfig = new ToasterConfig({
+      positionClass: 'toast-top-right',
+      timeout: 5000,
+      newestOnTop: true,
+      tapToDismiss: true,
+      preventDuplicates: false,
+      animation: 'slideDown',
+      limit: 5,
+    });
+    const toast: Toast = {
+      type: type,
+      title: title,
+      body: body,
+      timeout: 5000,
+      showCloseButton: false,
+      bodyOutputType: BodyOutputType.TrustedHtml,
+    };
+    this.toasterService.popAsync(toast);
   }
 
 }

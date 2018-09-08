@@ -17,9 +17,7 @@ export class VentasChartComponent implements AfterViewInit, OnDestroy {
   columns = [];
   total = [];
 
-  constructor(private theme: NbThemeService,
-  private crm: CrmService) {
-  }
+  constructor(private theme: NbThemeService, private crm: CrmService) { }
 
   ngAfterViewInit() {
     this.crm.getEntities('opportunities', this.query)

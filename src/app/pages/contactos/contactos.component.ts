@@ -7,6 +7,7 @@ import {CrmService} from '../../services/crm.service';
   templateUrl: './contactos.component.html'
 })
 export class ContactosComponent implements OnInit {
+  loading = true;
   settings = {
     add: {
       addButtonContent: '<i class="nb-plus"></i>',
@@ -68,7 +69,7 @@ export class ContactosComponent implements OnInit {
       .subscribe(
         (resp: any) => {
           this.source.load(resp.value);
-          // console.log(resp);
+          this.loading = false;
         }
       );
   }

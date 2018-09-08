@@ -44,6 +44,11 @@
     box-shadow: nb-theme(btn-hero-shadow);
   }
 
+  input.ng-invalid.ng-touched {
+    border: 1px solid nb-theme(color-danger);
+    box-shadow: btn-hero-danger-glow();
+  }
+
   .primary-container {
     .color {
       background-color: nb-theme(color-primary);

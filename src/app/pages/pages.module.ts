@@ -11,7 +11,9 @@ import {NgxEchartsModule} from 'ngx-echarts';
 import { OportunidadesChartComponent } from './home/charts/oportunidades-chart/oportunidades-chart.component';
 import {Ng2SmartTableModule} from 'ng2-smart-table';
 import { MapChartComponent } from './home/charts/map-chart/map-chart.component';
-import {FormsRoutingModule} from './forms/forms-routing.module';
+import {NbSpinnerModule} from '@nebular/theme';
+import {FormsModule} from '@angular/forms';
+import {ToasterModule} from 'angular2-toaster';
 
 const PAGES_COMPONENTS = [
   PagesComponent,
@@ -19,7 +21,8 @@ const PAGES_COMPONENTS = [
   CuentasComponent,
   ContactosComponent,
   VentasChartComponent,
-  OportunidadesChartComponent
+  OportunidadesChartComponent,
+  MapChartComponent
 ];
 
 @NgModule({
@@ -28,11 +31,12 @@ const PAGES_COMPONENTS = [
     ThemeModule,
     NgxEchartsModule,
     Ng2SmartTableModule,
-    // FormsRoutingModule
+    NbSpinnerModule,
+    FormsModule,
+    ToasterModule.forRoot()
   ],
   declarations: [
     ...PAGES_COMPONENTS,
-    MapChartComponent
   ],
 })
 export class PagesModule {

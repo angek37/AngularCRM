@@ -63,9 +63,9 @@ export const CORPORATE_THEME = {
 
     bubbleMap: {
       titleColor: '#484848',
-      areaColor: '#dddddd',
+      areaColor: '#E3E9EE',
       areaHoverColor: '#cccccc',
-      areaBorderColor: '#ebeef2',
+      areaBorderColor: '#85929E',
     },
 
     profitBarAnimationEchart: {
