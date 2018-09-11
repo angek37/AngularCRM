@@ -12,6 +12,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import {AuthenticationGuard, MsAdalAngular6Module} from 'microsoft-adal-angular6';
 import {environment} from '../environments/environment';
 import { LogoutComponent } from './logout/logout.component';
+import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
   declarations: [AppComponent, LogoutComponent],
@@ -25,6 +26,7 @@ import { LogoutComponent } from './logout/logout.component';
     ThemeModule.forRoot(),
     CoreModule.forRoot(),
     MsAdalAngular6Module.forRoot(environment.ad),
+    ToastrModule.forRoot()
   ],
   bootstrap: [AppComponent],
   providers: [

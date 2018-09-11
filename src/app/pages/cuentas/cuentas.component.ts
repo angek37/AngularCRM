@@ -4,7 +4,7 @@ import {CrmService} from '../../services/crm.service';
 import {NbThemeService} from '@nebular/theme';
 import {Subscription} from 'rxjs/index';
 import {NgForm} from '@angular/forms';
-import {BodyOutputType, Toast, ToasterConfig, ToasterService} from 'angular2-toaster';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -13,7 +13,13 @@ import {BodyOutputType, Toast, ToasterConfig, ToasterService} from 'angular2-toa
   styleUrls: ['./cuentas.component.scss']
 })
 export class CuentasComponent implements OnInit {
-  toasterConfig: ToasterConfig;
+  contact = {
+    contactid: null
+  };
+  contactsLength = 0;
+  contacts = [];
+  contactsBuffer = [];
+  row: any;
   flipped = false;
   loading = true;
   account = {
@@ -25,7 +31,7 @@ export class CuentasComponent implements OnInit {
   settings = {
     mode: 'external',
     actions: {
-      edit: false
+      edit: false,
     },
     add: {
       addButtonContent: '<i class="nb-plus"></i>',
@@ -79,11 +85,12 @@ export class CuentasComponent implements OnInit {
 
   source: LocalDataSource = new LocalDataSource();
   query = '$select=address1_city,address1_country,name&$expand=primarycontactid($select=emailaddress1,fullname)';
+  queryContacts = '$select=fullname&$count=true&$top=';
   settingsBtn: Array<any>;
   themeSubscription: Subscription;
 
 
-  constructor(private crm: CrmService, private themeService: NbThemeService, private toasterService: ToasterService) {
+  constructor(private crm: CrmService, private themeService: NbThemeService, private toastr: ToastrService) {
     this.themeSubscription = this.themeService.getJsTheme().subscribe(theme => {
       this.init(theme.variables);
     });
@@ -192,14 +199,24 @@ export class CuentasComponent implements OnInit {
           this.loading = false;
         }
       );
+    this.crm.getEntities('contacts', this.queryContacts + '10')
+      .subscribe(
+        (resp: any) => {
+          this.contactsLength = +resp['@odata.count'];
+          this.contacts = resp.value;
+          this.contactsBuffer = this.contacts.slice(0, 10);
+        }
+      );
   }
 
-  onDeleteConfirm(event): void {
-    if (window.confirm('Are you sure you want to delete?')) {
-      event.confirm.resolve();
-    } else {
-      event.confirm.reject();
-    }
+  onDeleteConfirm(): void {
+    this.crm.deleteEntity('accounts', this.row.data.accountid)
+      .subscribe(
+        (value: any) => {
+          this.toastr.success('La cuenta se eliminó de forma exitosa', '¡Éxito!');
+        },
+        (error1 => this.toastr.error('Ha ocurrido un error al eliminar la cuenta', '¡Error!'))
+      );
   }
 
   onSubmit(form: NgForm) {
@@ -217,34 +234,24 @@ export class CuentasComponent implements OnInit {
           this.loading = false;
           form.reset();
           this.flipped = false;
-          this.showToast('success', 'Éxito', 'Se ha creado la cuenta');
+          this.toastr.success('Se ha creado la cuenta', '¡Éxito!');
         }
         ,
         (error: any) => {
-          this.showToast('error', '¡Error!', 'Se ha producido un error al crear la cuenta');
+          this.toastr.error('Se ha producido un error al crear la cuenta', '¡Error!');
         }
       );
   }
 
-  private showToast(type: string, title: string, body: string) {
-    this.toasterConfig = new ToasterConfig({
-      positionClass: 'toast-top-right',
-      timeout: 5000,
-      newestOnTop: true,
-      tapToDismiss: true,
-      preventDuplicates: false,
-      animation: 'slideDown',
-      limit: 5,
-    });
-    const toast: Toast = {
-      type: type,
-      title: title,
-      body: body,
-      timeout: 5000,
-      showCloseButton: false,
-      bodyOutputType: BodyOutputType.TrustedHtml,
-    };
-    this.toasterService.popAsync(toast);
+  fetchMore() {
+    const len = this.contactsBuffer.length;
+    this.crm.getEntities('contacts', this.queryContacts + (10 + len))
+      .subscribe(
+        (resp: any) => {
+          this.contacts = resp.value;
+          this.contactsBuffer = this.contacts.slice(0, this.contacts.length);
+        }
+      );
   }
 
 }

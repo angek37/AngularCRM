@@ -1,13 +1,23 @@
 <nb-flip-card [showToggleButton]="false" [flipped]="flipped">
-  <toaster-container [toasterconfig]="toasterConfig"></toaster-container>
   <nb-card-front>
     <nb-card accent="primary" [nbSpinner]="loading" nbSpinnerMessage="Cargando..." nbSpinnerSize="large">
       <nb-card-header>
         Cuentas
       </nb-card-header>
       <nb-card-body>
-        <ng2-smart-table [settings]="settings" [source]="source" (create)="flipped = true" (deleteConfirm)="onDeleteConfirm($event)">
+        <ng2-smart-table [settings]="settings" [source]="source" (create)="flipped = true" (delete)="deleteSwal.show(); row = $event">
         </ng2-smart-table>
+        <swal
+          #deleteSwal
+          title="¿Eliminar?"
+          text="Esta acción no se puede deshacer"
+          type="warning"
+          [showCancelButton]="true"
+          [focusCancel]="true"
+          (confirm)="onDeleteConfirm()"
+          (cancel)="row = null"
+        >
+        </swal>
       </nb-card-body>
     </nb-card>
   </nb-card-front>
@@ -18,9 +28,29 @@
       </nb-card-header>
       <nb-card-body>
         <form (submit)="onSubmit(f)" #f="ngForm">
-          <div class="input-group">
-            <input type="text" ngModel name="name" placeholder="Nombre" required
-                   class="form-control" />
+          <div class="row">
+            <div class="input-group col-sm-9">
+              <input type="text" ngModel name="name" placeholder="Nombre" required
+                     class="form-control" />
+            </div>
+            <div class="col-sm-3">
+              <ng-select [items]="contactsBuffer"
+                         [virtualScroll]="true"
+                         bindLabel="fullname"
+                         bindValue="contactid"
+                         placeholder="Selecciona un Contacto"
+                         (scrollToEnd)="fetchMore($event)"
+                         [(ngModel)]="contact.contactid"
+                         name="contactid"
+              >
+                <ng-template ng-header-tmp>
+                  <small class="form-text text-muted">Cargados {{contactsBuffer.length}} de {{contactsLength}}</small>
+                </ng-template>
+                <ng-template ng-option-tmp let-item="item" let-index="index">
+                  {{item.fullname}}
+                </ng-template>
+              </ng-select>
+            </div>
           </div>
           <div class="row full-name-inputs">
             <div class="col-sm-6 input-group">
@@ -33,14 +63,11 @@
           <div class="input-group">
             <input type="text" name="country" ngModel placeholder="País" required class="form-control"/>
           </div>
-          <div class="input-group has-person-icon">
-            <input type="text" name="contact" ngModel placeholder="Contacto Principal" class="form-control"/>
-          </div>
           <button style="margin: 10px"
                   class="btn {{ settingsBtn[2].class }} btn-demo"
                   type="submit"
                   [disabled]="!f.valid">Guardar</button>
-          <button style="margin: 10px" class="btn {{ settingsBtn[4].class }} btn-demo" (click)="flipped = false; f.reset()">{{ settingsBtn[4].buttonTitle }}</button>
+          <button style="margin: 10px" type="button" class="btn {{ settingsBtn[4].class }} btn-demo" (click)="flipped = false; f.reset()">{{ settingsBtn[4].buttonTitle }}</button>
         </form>
       </nb-card-body>
     </nb-card>

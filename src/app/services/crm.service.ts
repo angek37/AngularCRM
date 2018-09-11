@@ -36,4 +36,9 @@ export class CrmService {
       entity, record,
       {headers: this.headers});
   }
+
+  deleteEntity(entity: string, record: string) {
+    return this.http.delete(environment.ad.crm + entity
+      + '(' + record + ')', {headers: this.headers});
+  }
 }

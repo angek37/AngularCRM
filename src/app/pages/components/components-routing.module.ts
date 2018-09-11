@@ -3,7 +3,6 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { ComponentsComponent } from './components.component';
 import { TreeComponent } from './tree/tree.component';
-import { NotificationsComponent } from './notifications/notifications.component';
 
 const routes: Routes = [{
   path: '',
@@ -12,10 +11,7 @@ const routes: Routes = [{
   {
     path: 'tree',
     component: TreeComponent,
-  }, {
-    path: 'notifications',
-    component: NotificationsComponent,
-  },
+  }
   ],
 }];
 
@@ -27,6 +23,5 @@ export class ComponentsRoutingModule { }
 
 export const routedComponents = [
   ComponentsComponent,
-  TreeComponent,
-  NotificationsComponent,
+  TreeComponent
 ];

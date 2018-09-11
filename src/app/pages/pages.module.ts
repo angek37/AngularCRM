@@ -13,7 +13,9 @@ import {Ng2SmartTableModule} from 'ng2-smart-table';
 import { MapChartComponent } from './home/charts/map-chart/map-chart.component';
 import {NbSpinnerModule} from '@nebular/theme';
 import {FormsModule} from '@angular/forms';
-import {ToasterModule} from 'angular2-toaster';
+import { SweetAlert2Module } from '@toverux/ngx-sweetalert2';
+import { NgSelectModule } from '@ng-select/ng-select';
+
 
 const PAGES_COMPONENTS = [
   PagesComponent,
@@ -33,7 +35,8 @@ const PAGES_COMPONENTS = [
     Ng2SmartTableModule,
     NbSpinnerModule,
     FormsModule,
-    ToasterModule.forRoot()
+    SweetAlert2Module.forRoot(),
+    NgSelectModule
   ],
   declarations: [
     ...PAGES_COMPONENTS,
