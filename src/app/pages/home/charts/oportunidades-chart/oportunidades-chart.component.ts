@@ -11,6 +11,7 @@ import {CrmService} from '../../../../services/crm.service';
 export class OportunidadesChartComponent implements AfterViewInit, OnDestroy {
   options: any = {};
   themeSubscription: any;
+  crmSubscription: any;
   loading = true;
   query = '$select=statecode';
   data = [
@@ -23,10 +24,9 @@ export class OportunidadesChartComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    this.crm.getEntities('opportunities', this.query)
+    this.crmSubscription = this.crm.getEntities('opportunities', this.query)
       .subscribe(
         (resp: any) => {
-          this.loading = false;
           resp.value.forEach(
             (element) => {
               switch (element.statecode) {
@@ -42,10 +42,13 @@ export class OportunidadesChartComponent implements AfterViewInit, OnDestroy {
               }
             }
           );
-          this.draw();
         },
         (error) => {
           console.log('An error has been occur');
+          this.draw();
+        },
+        () => {
+          this.loading = false;
           this.draw();
         }
       );
@@ -108,5 +111,6 @@ export class OportunidadesChartComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.themeSubscription.unsubscribe();
+    this.crmSubscription.unsubscribe();
   }
 }

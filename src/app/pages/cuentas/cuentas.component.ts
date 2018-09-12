@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import { LocalDataSource } from 'ng2-smart-table';
 import {CrmService} from '../../services/crm.service';
 import {NbThemeService} from '@nebular/theme';
-import {Subscription} from 'rxjs/index';
+import {Subscription} from 'rxjs/Rx';
 import {NgForm} from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 
@@ -12,13 +12,16 @@ import { ToastrService } from 'ngx-toastr';
   templateUrl: './cuentas.component.html',
   styleUrls: ['./cuentas.component.scss']
 })
-export class CuentasComponent implements OnInit {
+export class CuentasComponent implements OnInit, OnDestroy {
   contact = {
     contactid: null
   };
+  contactsSubscription: Subscription;
+  accountsSubscription: Subscription;
   contactsLength = 0;
   contacts = [];
   contactsBuffer = [];
+  loadingSelect = false;
   row: any;
   flipped = false;
   loading = true;
@@ -192,30 +195,40 @@ export class CuentasComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.crm.getEntities('accounts', this.query)
+    this.fetchAccounts();
+    this.contactsSubscription = this.crm.getEntities('contacts', this.queryContacts + '50')
+      .subscribe(
+        (resp: any) => {
+          this.loadingSelect = true;
+          this.contactsLength = +resp['@odata.count'];
+          this.contacts = resp.value;
+          this.contactsBuffer = this.contacts;
+        },
+        null,
+        () => { this.loadingSelect = false; }
+      );
+  }
+
+  fetchAccounts() {
+    this.accountsSubscription = this.crm.getEntities('accounts', this.query)
       .subscribe(
         (resp: any) => {
           this.source.load(resp.value);
           this.loading = false;
         }
       );
-    this.crm.getEntities('contacts', this.queryContacts + '10')
-      .subscribe(
-        (resp: any) => {
-          this.contactsLength = +resp['@odata.count'];
-          this.contacts = resp.value;
-          this.contactsBuffer = this.contacts.slice(0, 10);
-        }
-      );
   }
 
   onDeleteConfirm(): void {
+    this.loading = true;
     this.crm.deleteEntity('accounts', this.row.data.accountid)
       .subscribe(
-        (value: any) => {
+        null,
+        (error1 => this.toastr.error('Ha ocurrido un error al eliminar la cuenta', '¡Error!')),
+        () => {
+          this.loading = false;
           this.toastr.success('La cuenta se eliminó de forma exitosa', '¡Éxito!');
-        },
-        (error1 => this.toastr.error('Ha ocurrido un error al eliminar la cuenta', '¡Error!'))
+        }
       );
   }
 
@@ -225,33 +238,43 @@ export class CuentasComponent implements OnInit {
     this.account.address1_city = form.form.value.city;
     this.account.address1_stateorprovince = form.form.value.state;
     this.account.address1_country = form.form.value.country;
-    if (form.form.value.contact !== '') {
-      this.account['primarycontactid@odata.bind'] = '/contacts(' + form.form.value.contact + ')';
+    if (form.form.value.contactid !== '') {
+      this.account['primarycontactid@odata.bind'] = '/contacts(' + form.form.value.contactid + ')';
     }
     this.crm.postEntity('accounts', this.account)
       .subscribe(
-        (value: any) => {
+        null,
+        (error: any) => {
+          this.toastr.error('Se ha producido un error al crear la cuenta', '¡Error!');
+        },
+        () => {
           this.loading = false;
           form.reset();
           this.flipped = false;
           this.toastr.success('Se ha creado la cuenta', '¡Éxito!');
-        }
-        ,
-        (error: any) => {
-          this.toastr.error('Se ha producido un error al crear la cuenta', '¡Error!');
         }
       );
   }
 
   fetchMore() {
     const len = this.contactsBuffer.length;
-    this.crm.getEntities('contacts', this.queryContacts + (10 + len))
-      .subscribe(
-        (resp: any) => {
-          this.contacts = resp.value;
-          this.contactsBuffer = this.contacts.slice(0, this.contacts.length);
-        }
-      );
+    if (len !== this.contactsLength) {
+      this.loadingSelect = true;
+      this.contactsSubscription = this.crm.getEntities('contacts', this.queryContacts + (50 + len))
+        .subscribe(
+          (resp: any) => {
+            this.contacts = resp.value;
+            this.contactsBuffer = this.contacts.slice(0, this.contacts.length);
+          },
+          null,
+          () => { this.loadingSelect = false; }
+        );
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.contactsSubscription.unsubscribe();
+    this.accountsSubscription.unsubscribe();
   }
 
 }

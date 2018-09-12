@@ -11,6 +11,7 @@ import {CrmService} from '../../../../services/crm.service';
 export class VentasChartComponent implements AfterViewInit, OnDestroy {
   options: any = {};
   themeSubscription: any;
+  crmSubscription: any;
   loading = true;
   data: any;
   query = '$select=actualvalue&$expand=owninguser($select=fullname)&$orderby=actualvalue desc&$top=7';
@@ -20,21 +21,23 @@ export class VentasChartComponent implements AfterViewInit, OnDestroy {
   constructor(private theme: NbThemeService, private crm: CrmService) { }
 
   ngAfterViewInit() {
-    this.crm.getEntities('opportunities', this.query)
+    this.crmSubscription = this.crm.getEntities('opportunities', this.query)
       .subscribe(
         (resp: Response) => {
           this.data = resp;
-          this.loading = false;
           this.data.value.forEach(
             (element: any) => {
               this.columns.push(element.owninguser.fullname);
               this.total.push(element.actualvalue);
             }
           );
-          this.draw();
         },
         (error) => {
           console.log('An error has been occur');
+          this.draw();
+        },
+        () => {
+          this.loading = false;
           this.draw();
         }
       );
@@ -114,5 +117,6 @@ export class VentasChartComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.themeSubscription.unsubscribe();
+    this.crmSubscription.unsubscribe();
   }
 }

@@ -12,7 +12,7 @@ import {CrmService} from '../../../../services/crm.service';
   template: '<div echarts [loading]="loading" [options]="options" class="echarts"></div>',
 })
 export class MapChartComponent implements OnDestroy {
-
+  crmSubscription: any;
   latlong: any = {};
   mapData: any[];
   max = -Infinity;
@@ -21,7 +21,6 @@ export class MapChartComponent implements OnDestroy {
   loading = true;
   query = '$select=address1_stateorprovince' +
     '&$filter=address1_country eq \'Mexico\' or%20 address1_country eq \'mx\' or%20 address1_country eq \'México\'';
-
   bubbleTheme: any;
   geoColors: any[];
   statesInf: any[];
@@ -38,11 +37,14 @@ export class MapChartComponent implements OnDestroy {
         this.geoColors = [colors.primary, colors.info, colors.success, colors.warning, colors.danger];
       }
     );
-    this.crm.getEntities('accounts', this.query)
+    this.crmSubscription = this.crm.getEntities('accounts', this.query)
       .subscribe(
         (resp: any) => {
           this.groupByState(resp.value);
           this.mapData = this.statesInf;
+        },
+        null,
+        () => {
           this.draw();
           this.loading = false;
         }
@@ -194,6 +196,7 @@ export class MapChartComponent implements OnDestroy {
 
   ngOnDestroy() {
     this.alive = false;
+    this.crmSubscription.unsubscribe();
   }
 
   private getRandomGeoColor() {
