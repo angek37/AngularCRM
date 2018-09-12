@@ -5,7 +5,7 @@
         Cuentas
       </nb-card-header>
       <nb-card-body>
-        <ng2-smart-table [settings]="settings" [source]="source" (create)="flipped = true" (delete)="deleteSwal.show(); row = $event">
+        <ng2-smart-table [settings]="settings" [source]="source" (create)="flipped = true" (edit)="onEdit($event)" (delete)="deleteSwal.show(); row = $event">
         </ng2-smart-table>
         <swal
           #deleteSwal
@@ -33,7 +33,7 @@
               <input type="text" ngModel name="name" placeholder="Nombre" required
                      class="form-control" />
             </div>
-            <div class="col-sm-3">
+            <div class="col-sm-3" *ngIf="!editing">
               <ng-select [items]="contactsBuffer"
                          [virtualScroll]="true"
                          bindLabel="fullname"
@@ -58,7 +58,7 @@
               <input type="text" ngModel name="city" placeholder="Ciudad" class="form-control"/>
             </div>
             <div class="col-sm-6 input-group">
-              <input type="text" ngModel name="state" placeholder="Estado" required class="form-control"/>
+              <input type="text" ngModel name="state" placeholder="Estado" *ngIf="!editing" required class="form-control"/>
             </div>
           </div>
           <div class="input-group">
@@ -68,7 +68,7 @@
                   class="btn {{ settingsBtn[2].class }} btn-demo"
                   type="submit"
                   [disabled]="!f.valid">Guardar</button>
-          <button style="margin: 10px" type="button" class="btn {{ settingsBtn[4].class }} btn-demo" (click)="flipped = false; f.reset()">{{ settingsBtn[4].buttonTitle }}</button>
+          <button style="margin: 10px" type="button" class="btn {{ settingsBtn[4].class }} btn-demo" (click)="flipped = false; f.reset(); editing = false">{{ settingsBtn[4].buttonTitle }}</button>
         </form>
       </nb-card-body>
     </nb-card>

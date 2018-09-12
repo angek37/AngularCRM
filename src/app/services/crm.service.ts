@@ -41,4 +41,9 @@ export class CrmService {
     return this.http.delete(environment.ad.crm + entity
       + '(' + record + ')', {headers: this.headers});
   }
+
+  updateEntity(entity: string, record: any, id: string) {
+    return this.http.patch(environment.ad.crm + entity
+      + '(' + id + ')', record, {headers: this.headers});
+  }
 }
